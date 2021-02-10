@@ -7,20 +7,25 @@ const Home = () => {
 
     const [name, setName] = useState('mario');
     
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         // console.log('use effect ran');
         // console.log(blogs);
         // console.log(name);
+        // simulate loading taking 1 second for test
+        setTimeout(() => {
+            fetch('http://localhost:8000/blogs')
+            .then(res => {
+                return res.json();
+            })
+            .then((data) => {
+                // console.log(data);
+                setBlogs(data);
+                setIsLoading(false);
+            });
 
-        fetch('http://localhost:8000/blogs')
-        .then(res => {
-            return res.json();
-        })
-        .then((data) => {
-            // console.log(data);
-            setBlogs(data);
-        });
+        }, 1000);
 
 
 
@@ -30,6 +35,7 @@ const Home = () => {
     return ( 
         <div className="home">
             {/* conditional templating. first it's null so it checks first if true, just waits && move to right side, evaluate, output values from json */}
+            { isLoading && <div>Loading ... </div>}
             { blogs && <BlogList blogs={blogs} title="All Blogs!" />}
             {/* <BlogList blogs={blogs.filter((blog) => blog.author === 'mario' )} title="Mario's Blogs!" />       */}
             {/* <button onClick={() => setName('luigi')}>change name</button> */}
