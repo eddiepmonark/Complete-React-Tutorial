@@ -9,6 +9,8 @@ const Home = () => {
     
     const [isLoading, setIsLoading] = useState(true);
 
+    const [error, setError] = useState(null);
+
     useEffect(() => {
         // console.log('use effect ran');
         // console.log(blogs);
@@ -16,14 +18,25 @@ const Home = () => {
         // simulate loading taking 1 second for test
         setTimeout(() => {
             fetch('http://localhost:8000/blogs')
-            .then(res => {
-                return res.json();
-            })
-            .then((data) => {
-                // console.log(data);
-                setBlogs(data);
-                setIsLoading(false);
-            });
+                .then(res => {
+                    // console.log(res);
+                    if(!res.ok) {
+                        throw Error('Could not fetch the data for that resource');
+                    }
+                    return res.json();
+                })
+                .then((data) => {
+                    // console.log(data);
+                    setBlogs(data);
+                    setIsLoading(false);
+                    setError(null);
+                })
+                .catch(err => {
+                    // console.log(err.message);
+                    setIsLoading(false);
+                    setError(err.message);
+
+                })
 
         }, 1000);
 
@@ -35,6 +48,7 @@ const Home = () => {
     return ( 
         <div className="home">
             {/* conditional templating. first it's null so it checks first if true, just waits && move to right side, evaluate, output values from json */}
+            { error && <div>{ error }</div>}
             { isLoading && <div>Loading ... </div>}
             { blogs && <BlogList blogs={blogs} title="All Blogs!" />}
             {/* <BlogList blogs={blogs.filter((blog) => blog.author === 'mario' )} title="Mario's Blogs!" />       */}
